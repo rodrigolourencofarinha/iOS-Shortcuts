@@ -1,0 +1,387 @@
+{
+   "WFWorkflowMinimumClientVersionString": "1113",
+   "WFWorkflowMinimumClientVersion": 1113,
+   "WFWorkflowIcon": {
+      "WFWorkflowIconStartColor": -12365313,
+      "WFWorkflowIconGlyphNumber": 61587
+   },
+   "WFWorkflowClientVersion": "3217.0.4",
+   "WFWorkflowActions": [
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.extracttextfromimage",
+         "WFWorkflowActionParameters": {
+            "WFImage": {
+               "Value": {
+                  "Type": "ExtensionInput",
+                  "Aggrandizements": [
+                     {
+                        "Type": "WFCoercionVariableAggrandizement",
+                        "CoercionItemClass": "WFImageContentItem"
+                     }
+                  ]
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "UUID": "66C45A39-F97F-4F3B-885C-DD5D6834F790"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.setvariable",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "OutputUUID": "66C45A39-F97F-4F3B-885C-DD5D6834F790",
+                  "Type": "ActionOutput",
+                  "OutputName": "Text from Image"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "WFVariableName": "Raw txt"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.gettext",
+         "WFWorkflowActionParameters": {
+            "UUID": "8495F613-E8B8-438B-A486-5A9C11A0438A",
+            "WFTextActionText": {
+               "Value": {
+                  "string": "From the provided text below, identify and extract any clear, specific tasks mentioned. Tasks should be action-oriented and focus on activities such as “send,” “prepare,” “review,” etc. Additionally, create a “Context” field that explains the source or relevance of the tasks, including key considerations or points of attention.\n\nGuidelines:\n\t•\tThe “Context” section should provide a concise explanation of the tasks’ origins or purpose.\n\t•\tList each task as a separate line under the “Task” section.\n\t•\tIf no tasks are identified from the text, leave all fields blank.\n       •\tTasks should not have punctuation\n       •    Create context first and tasks second \n\t•\tOutput format must strictly follow this structure:\n\nContext: [context description]  \nTask: [task description]  \nTask: [task description]  \n\nOutput example:\n\nContext: The tasks are related to end-of-month reporting for the sales department.  \nTask: Prepare a report on monthly sales\nTask: Send the finalized report to the team\n\nImportant: Return the response as a line-separated list, without any conversational text or additional comments.\n\n\uFFFC",
+                  "attachmentsByRange": {
+                     "{1109, 1}": {
+                        "VariableName": "Raw txt",
+                        "Type": "Variable"
+                     }
+                  }
+               },
+               "WFSerializationType": "WFTextTokenString"
+            }
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "com.openai.chat.AskIntent",
+         "WFWorkflowActionParameters": {
+            "newChat": true,
+            "AppIntentDescriptor": {
+               "TeamIdentifier": "2DC432GLL2",
+               "BundleIdentifier": "com.openai.chat",
+               "AppIntentIdentifier": "AskIntent",
+               "Name": "ChatGPT"
+            },
+            "UUID": "AB89F6FD-2B14-42F9-B916-AFC45E6A539D",
+            "prompt": {
+               "Value": {
+                  "string": "\uFFFC",
+                  "attachmentsByRange": {
+                     "{0, 1}": {
+                        "OutputUUID": "8495F613-E8B8-438B-A486-5A9C11A0438A",
+                        "Type": "ActionOutput",
+                        "OutputName": "Text"
+                     }
+                  }
+               },
+               "WFSerializationType": "WFTextTokenString"
+            },
+            "model": {
+               "title": {
+                  "key": "GPT-4o"
+               },
+               "subtitle": {
+                  "key": "GPT-4o"
+               },
+               "identifier": "gpt-4o"
+            },
+            "ShowWhenRun": false
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.setvariable",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "OutputUUID": "AB89F6FD-2B14-42F9-B916-AFC45E6A539D",
+                  "Type": "ActionOutput",
+                  "OutputName": "Ask ChatGPT"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "WFVariableName": "GPT TXT"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.text.split",
+         "WFWorkflowActionParameters": {
+            "WFTextSeparator": "New Lines",
+            "text": {
+               "Value": {
+                  "VariableName": "GPT TXT",
+                  "Type": "Variable"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "UUID": "E987DDC6-0E07-4C4B-B20A-D37975EC7BF0"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.repeat.each",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "OutputUUID": "E987DDC6-0E07-4C4B-B20A-D37975EC7BF0",
+                  "Type": "ActionOutput",
+                  "OutputName": "Split Text"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "WFControlFlowMode": 0,
+            "UUID": "30BBD6F2-C70A-4C86-B4DC-500A0B2222D2",
+            "GroupingIdentifier": "4E0B9523-5DA6-405B-A72C-5D610412584A"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Type": "Variable",
+               "Variable": {
+                  "Value": {
+                     "VariableName": "Repeat Item",
+                     "Type": "Variable"
+                  },
+                  "WFSerializationType": "WFTextTokenAttachment"
+               }
+            },
+            "WFControlFlowMode": 0,
+            "UUID": "0E0028A3-E129-4179-9EDD-A448562BE0C5",
+            "WFConditionalActionString": "Context",
+            "GroupingIdentifier": "F6723906-A9D3-42EB-99E5-7D4A5D0E4C92",
+            "WFCondition": 99
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.text.split",
+         "WFWorkflowActionParameters": {
+            "WFTextCustomSeparator": ": ",
+            "UUID": "68C05A82-31B4-43FE-AD11-30E661C5DD70",
+            "WFTextSeparator": "Custom",
+            "text": {
+               "Value": {
+                  "VariableName": "Repeat Item",
+                  "Type": "Variable"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            }
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.getitemfromlist",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "OutputUUID": "68C05A82-31B4-43FE-AD11-30E661C5DD70",
+                  "Type": "ActionOutput",
+                  "OutputName": "Split Text"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "WFItemSpecifier": "Items in Range",
+            "UUID": "613ACD6E-F367-4F5D-AD63-688DF3D19D0A",
+            "WFItemRangeStart": "2"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.setvariable",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "OutputUUID": "613ACD6E-F367-4F5D-AD63-688DF3D19D0A",
+                  "Type": "ActionOutput",
+                  "OutputName": "Item from List"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "WFVariableName": "Context"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "GroupingIdentifier": "F6723906-A9D3-42EB-99E5-7D4A5D0E4C92",
+            "WFControlFlowMode": 1
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "UUID": "C4DAE37C-CEAE-4BD5-B226-9B00973F6BEA",
+            "GroupingIdentifier": "F6723906-A9D3-42EB-99E5-7D4A5D0E4C92",
+            "WFControlFlowMode": 2
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.repeat.each",
+         "WFWorkflowActionParameters": {
+            "GroupingIdentifier": "4E0B9523-5DA6-405B-A72C-5D610412584A",
+            "WFControlFlowMode": 2
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.repeat.each",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "OutputUUID": "E987DDC6-0E07-4C4B-B20A-D37975EC7BF0",
+                  "Type": "ActionOutput",
+                  "OutputName": "Split Text"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "WFControlFlowMode": 0,
+            "UUID": "5EC9DD2F-370D-44EC-B527-3F5203CF0E78",
+            "GroupingIdentifier": "B17DD1E2-9ECD-4CCD-B39B-9E5DA848289C"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Type": "Variable",
+               "Variable": {
+                  "Value": {
+                     "VariableName": "Repeat Item",
+                     "Type": "Variable"
+                  },
+                  "WFSerializationType": "WFTextTokenAttachment"
+               }
+            },
+            "WFControlFlowMode": 0,
+            "UUID": "B4B60964-B011-4E1A-A8F1-617A1BD23085",
+            "WFConditionalActionString": "Task",
+            "GroupingIdentifier": "2A210646-1787-4A85-9852-3BEE10F494A3",
+            "WFCondition": 99
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.text.split",
+         "WFWorkflowActionParameters": {
+            "WFTextCustomSeparator": ": ",
+            "UUID": "F4819108-E88B-4643-86DE-FAF0FD095908",
+            "WFTextSeparator": "Custom",
+            "text": {
+               "Value": {
+                  "VariableName": "Repeat Item",
+                  "Type": "Variable"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            }
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.getitemfromlist",
+         "WFWorkflowActionParameters": {
+            "WFInput": {
+               "Value": {
+                  "OutputUUID": "F4819108-E88B-4643-86DE-FAF0FD095908",
+                  "Type": "ActionOutput",
+                  "OutputName": "Split Text"
+               },
+               "WFSerializationType": "WFTextTokenAttachment"
+            },
+            "WFItemSpecifier": "Items in Range",
+            "UUID": "C946E9D3-3747-4A5F-AD79-D92F259E7B39",
+            "WFItemRangeStart": "2"
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "com.todoist.ios.CreateTaskIntent",
+         "WFWorkflowActionParameters": {
+            "contentDescription": {
+               "Value": {
+                  "string": "\uFFFC",
+                  "attachmentsByRange": {
+                     "{0, 1}": {
+                        "VariableName": "Context",
+                        "Type": "Variable"
+                     }
+                  }
+               },
+               "WFSerializationType": "WFTextTokenString"
+            },
+            "content": {
+               "Value": {
+                  "string": "\uFFFC",
+                  "attachmentsByRange": {
+                     "{0, 1}": {
+                        "OutputUUID": "C946E9D3-3747-4A5F-AD79-D92F259E7B39",
+                        "Type": "ActionOutput",
+                        "OutputName": "Item from List"
+                     }
+                  }
+               },
+               "WFSerializationType": "WFTextTokenString"
+            },
+            "UUID": "0CECE036-C3B9-484A-B2B0-AE6BEBF3BA9B",
+            "AppIntentDescriptor": {
+               "TeamIdentifier": "S3DD273774",
+               "BundleIdentifier": "com.todoist.ios",
+               "AppIntentIdentifier": "CreateTaskIntent",
+               "Name": "Todoist"
+            },
+            "labels": {
+               "title": {
+                  "key": "chatgpt"
+               },
+               "identifier": "personal-2176639111",
+               "subtitle": {
+                  "key": "chatgpt"
+               },
+               "image": {
+                  "uri": "siri-client-cache:///?bundleType=e&imageName=LabelSymbol&bundleIdentifier=com.todoist.ios",
+                  "type": "Bundle"
+               }
+            }
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "GroupingIdentifier": "2A210646-1787-4A85-9852-3BEE10F494A3",
+            "WFControlFlowMode": 1
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.conditional",
+         "WFWorkflowActionParameters": {
+            "UUID": "073DFFFD-E725-49B4-90DB-BAD8DF001969",
+            "GroupingIdentifier": "2A210646-1787-4A85-9852-3BEE10F494A3",
+            "WFControlFlowMode": 2
+         }
+      },
+      {
+         "WFWorkflowActionIdentifier": "is.workflow.actions.repeat.each",
+         "WFWorkflowActionParameters": {
+            "UUID": "5F34EF73-75F0-45E8-9DCD-10B2C7FC68E6",
+            "GroupingIdentifier": "B17DD1E2-9ECD-4CCD-B39B-9E5DA848289C",
+            "WFControlFlowMode": 2
+         }
+      }
+   ],
+   "WFWorkflowNoInputBehavior": {
+      "Name": "WFWorkflowNoInputBehaviorShowError",
+      "Parameters": {
+         "Error": "Please use this shortcut from the share sheet."
+      }
+   },
+   "WFWorkflowHasOutputFallback": false,
+   "WFWorkflowOutputContentItemClasses": [],
+   "WFWorkflowInputContentItemClasses": [
+      "WFImageContentItem",
+      "WFStringContentItem",
+      "WFRichTextContentItem"
+   ],
+   "WFWorkflowTypes": [
+      "ActionExtension"
+   ],
+   "WFWorkflowImportQuestions": [],
+   "WFQuickActionSurfaces": [],
+   "WFWorkflowHasShortcutInputVariables": true
+}
