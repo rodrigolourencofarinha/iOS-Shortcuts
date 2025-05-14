@@ -5,7 +5,7 @@ This repository contains a personal collection of iOS Shortcuts I've customized 
 
 ## Source and Export
 
-Shortcuts are exported using this [Shortcut on Routinehub](https://routinehub.co/shortcut/5256/)Files are saved in `.shortcut` format (for reimport) and `.json` format (for inspection).
+Shortcuts are exported using this [Shortcut on Routinehub](https://routinehub.co/shortcut/5256/) Files are saved in `.shortcut` format (for reimport) and `.json` format (for inspection).
 
 ## Included Shortcuts
 
